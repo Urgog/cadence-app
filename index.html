@@ -303,6 +303,8 @@ const GAME_DEFAULT = {
   },
   // tierFrameMap[palier] = index cadre (null = aucun) ; palier 0 toujours null
   tierFrameMap: [null, 0, 1, 2, 3, 4, 5, 6, 7],
+  // frameColors[i] = couleur de teinte pour le cadre i (null = couleur d'origine)
+  frameColors: ["#CD7F32","#C0C0C0","#3CB371","#4169E1","#8B008B","#FFD700","#FF8C00","#FF69B4","#C39BD3"],
   shop: [], // Les titres se débloquent via les hauts faits de palier
 };
 const RARITY_KEYS = ["commune", "rare", "epique", "legendaire"];
@@ -344,6 +346,9 @@ const normalizeGame = (g) => ({
   tierFrameMap: Array.isArray(g && g.tierFrameMap) && g.tierFrameMap.length === 9
     ? g.tierFrameMap.map((v, i) => i === 0 ? null : (v == null ? null : Math.max(0,Math.min(8,+v))))
     : [...GAME_DEFAULT.tierFrameMap],
+  frameColors: Array.isArray(g && g.frameColors) && g.frameColors.length === 9
+    ? g.frameColors
+    : [...GAME_DEFAULT.frameColors],
   shop: Array.isArray(g && g.shop) && g.shop.length
     ? g.shop.map((i) => ({ ...i }))
     : GAME_DEFAULT.shop.map((i) => ({ ...i })),
@@ -601,21 +606,19 @@ const FRAME_SPRITES = [
 ];
 const FRAME_NAMES = ["Bronze","Argent","Vert","Bleu","Violet","Or","Orange","Rose","Légendaire"];
 
-function AvatarFrame({ frameIndex, size }) {
+function AvatarFrame({ frameIndex, size, tint }) {
   const src = FRAME_SPRITES[frameIndex];
   if (src == null) return null;
   return (
-    <img src={src} alt="" style={{
-      position:"absolute", left:0, top:0,
-      width:size, height:size,
-      pointerEvents:"none", zIndex:2,
-      imageRendering:"auto",
-    }} />
+    <div style={{position:"absolute",left:0,top:0,width:size,height:size,pointerEvents:"none",zIndex:2,isolation:"isolate"}}>
+      <img src={src} alt="" style={{position:"absolute",left:0,top:0,width:size,height:size,imageRendering:"auto"}} />
+      {tint && <div style={{position:"absolute",inset:0,background:tint,mixBlendMode:"color",pointerEvents:"none"}} />}
+    </div>
   );
 }
 
 
-function Avatar({ level, size, frame, large }) {
+function Avatar({ level, size, frame, large, frameTint }) {
   const styled = frame != null;
   // Fenêtre intérieure du cadre ≈ 68% de la taille, centrée avec léger décalage haut
   const inner = styled ? Math.round(size * 0.68) : size;
@@ -627,7 +630,7 @@ function Avatar({ level, size, frame, large }) {
         <span style={{ position: "absolute", left: padL, top: padT, zIndex:1 }}>
           <AvatarBitmap level={level} size={inner} />
         </span>
-        {styled && <AvatarFrame frameIndex={frame} size={size} />}
+        {styled && <AvatarFrame frameIndex={frame} size={size} tint={frameTint} />}
       </span>
     </span>
   );
@@ -869,6 +872,10 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
   const setTierFrame = (ti, v) => setGameConfig(g => ({ ...g,
     tierFrameMap: (g.tierFrameMap||GAME_DEFAULT.tierFrameMap).map((f,i) =>
       i===ti ? (v===""||v==null ? null : Math.max(0,Math.min(8,+v))) : f) }));
+  const setFrameColor = (i, v) => setGameConfig(g => ({
+    ...g,
+    frameColors: (g.frameColors||GAME_DEFAULT.frameColors).map((c, j) => j === i ? v : c),
+  }));
   return (
     <Overlay onClose={onClose}>
       <div className="cad-modal" onClick={(e) => e.stopPropagation()}>
@@ -948,13 +955,15 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
 
         {view === "cadres" && (
         <div className="cad-tabpane">
-          <p className="cad-hint">Attribuez chaque cadre à un palier et visualisez l'aperçu en direct. Le cadre Légendaire est réservé au niveau 100.</p>
+          <p className="cad-hint">Attribuez chaque cadre à un palier, personnalisez sa couleur et visualisez le résultat en direct.</p>
           <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:8}}>
             {FRAME_SPRITES.map((fsrc, i) => {
               const seuils = [0,12,23,34,45,56,67,78,89];
               const tfm = cfg.tierFrameMap || GAME_DEFAULT.tierFrameMap;
+              const frameColors = cfg.frameColors || GAME_DEFAULT.frameColors;
               const isLegendary = i === 8;
               const assignedTier = isLegendary ? -1 : tfm.findIndex((f, ti) => f === i && ti > 0);
+              const tint = frameColors[i] || null;
               return (
                 <div key={i} style={{
                   display:"flex", alignItems:"center", gap:10,
@@ -962,13 +971,19 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
                   background: isLegendary ? "#ffffff05" : "#ffffff07",
                   border: isLegendary ? "1px solid #ffd70030" : "1px solid #ffffff10",
                 }}>
-                  {/* Cadre seul, sans personnage */}
-                  <div style={{width:52,height:52,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                    <img src={fsrc} alt={FRAME_NAMES[i]} style={{width:52,height:52,imageRendering:"auto"}} />
+                  {/* Cadre seul avec teinte appliquée */}
+                  <div style={{width:52,height:52,flexShrink:0,position:"relative",isolation:"isolate"}}>
+                    <img src={fsrc} alt={FRAME_NAMES[i]} style={{position:"absolute",inset:0,width:52,height:52,imageRendering:"auto"}} />
+                    {tint && <div style={{position:"absolute",inset:0,background:tint,mixBlendMode:"color",pointerEvents:"none"}} />}
                   </div>
-                  {/* Nom + sélecteur palier */}
+                  {/* Nom + color picker + sélecteur palier */}
                   <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:12,fontWeight:600,color:isLegendary?"#ffd700":"inherit",marginBottom:3}}>{FRAME_NAMES[i]}</div>
+                    <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                      <input type="color" className="cad-in cad-color" value={tint||"#ffffff"}
+                        onChange={e => setFrameColor(i, e.target.value)}
+                        title="Couleur du cadre" style={{width:26,height:22,padding:1,flexShrink:0}} />
+                      <span style={{fontSize:12,fontWeight:600,color:isLegendary?"#ffd700":"inherit"}}>{FRAME_NAMES[i]}</span>
+                    </div>
                     {isLegendary
                       ? <div style={{fontSize:10,opacity:.5}}>Succès spécial — cadre fixe (Niv. 100)</div>
                       : (
@@ -992,12 +1007,12 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
                       )
                     }
                   </div>
-                  {/* Aperçu live : personnage du palier attribué (sans cadre pour éviter le conflit visuel) */}
-                  <div style={{flexShrink:0,width:52,height:52,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  {/* Aperçu live : avatar du palier + cadre teinté */}
+                  <div style={{flexShrink:0,width:56,height:56,display:"flex",alignItems:"center",justifyContent:"center"}}>
                     {isLegendary
-                      ? <AvatarBitmap level={89} size={48} />
+                      ? <Avatar level={89} size={52} frame={8} frameTint={tint} />
                       : assignedTier >= 1
-                        ? <AvatarBitmap level={seuils[assignedTier] || 1} size={48} />
+                        ? <Avatar level={seuils[assignedTier]||1} size={52} frame={i} frameTint={tint} />
                         : <span style={{opacity:.2,fontSize:18,lineHeight:1}}>—</span>
                     }
                   </div>
