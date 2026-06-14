@@ -1618,7 +1618,7 @@ function QuickAdd({ qTitle, setQTitle, qDue, setQDue, qRarity, setQRarity, quick
       <input className="cad-qdate" type="date" value={qDue} onChange={(e) => setQDue(e.target.value)} title="Échéance" />
       <select className="cad-qprio" value={qRarity} onChange={(e) => setQRarity(e.target.value)} title="Rareté"
         style={{ color: (RARITY[qRarity] || RARITY.commune).color }}>
-        {RARITY_KEYS.map((k) => <option key={k} value={k}>{RARITY[k].label}</option>)}
+        {RARITY_KEYS.map((k) => <option key={k} value={k} style={{ color: RARITY[k].color }}>{RARITY[k].label}</option>)}
       </select>
       <button className="cad-qbtn" onClick={quickAdd} disabled={!qTitle.trim()}><Plus size={18} /></button>
     </div>
