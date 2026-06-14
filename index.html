@@ -766,7 +766,12 @@ function ProfileModal({ player, lvl, doneCount, shopItems, frame, cfg, setPlayer
             <label className="cad-lbl">Cadre d'avatar</label>
             <div className="cad-equip-row" style={{flexWrap:"wrap",gap:6}}>
               <button className={player.frame == null ? "on" : ""} onClick={() => equip("frame", null)}>Aucun</button>
-              {(player.unlockedFrames||[0]).map((fi) => (
+              {[...(player.unlockedFrames||[0])].sort((a, b) => {
+                const tfm = (cfg||GAME_DEFAULT).tierFrameMap || GAME_DEFAULT.tierFrameMap;
+                const ta = a === 8 ? 99 : tfm.findIndex((f, i) => f === a && i > 0);
+                const tb = b === 8 ? 99 : tfm.findIndex((f, i) => f === b && i > 0);
+                return (ta < 0 ? 98 : ta) - (tb < 0 ? 98 : tb);
+              }).map((fi) => (
                 <button key={fi} className={player.frame === fi ? "on" : ""} onClick={() => equip("frame", fi)}
                   style={{padding:2,lineHeight:0}}>
                   <img src={FRAME_SPRITES[fi]} alt={`Cadre ${fi}`} style={{width:36,height:36,imageRendering:"auto"}} />
@@ -2324,7 +2329,7 @@ function TaskModal({ initial, isNew, onClose, onSave, onDelete }) {
             <div className="cad-prio-pick">
               {Object.entries(RARITY).map(([k, v]) => (
                 <button key={k} className={rarity === k ? "on" : ""} onClick={() => setRarity(k)}
-                  style={rarity === k ? { background: v.soft, color: v.color, borderColor: v.color } : {}}>
+                  style={{ background: v.soft, color: v.color, borderColor: v.color, opacity: rarity === k ? 1 : 0.45 }}>
                   <Gem size={12} /> {v.label}
                 </button>
               ))}
