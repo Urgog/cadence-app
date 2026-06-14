@@ -992,12 +992,12 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
                       )
                     }
                   </div>
-                  {/* Aperçu live : avatar du palier attribué + ce cadre */}
+                  {/* Aperçu live : personnage du palier attribué (sans cadre pour éviter le conflit visuel) */}
                   <div style={{flexShrink:0,width:52,height:52,display:"flex",alignItems:"center",justifyContent:"center"}}>
                     {isLegendary
-                      ? <Avatar level={89} size={52} frame={8} />
+                      ? <AvatarBitmap level={89} size={48} />
                       : assignedTier >= 1
-                        ? <Avatar level={seuils[assignedTier] || 1} size={52} frame={i} />
+                        ? <AvatarBitmap level={seuils[assignedTier] || 1} size={48} />
                         : <span style={{opacity:.2,fontSize:18,lineHeight:1}}>—</span>
                     }
                   </div>
