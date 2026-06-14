@@ -887,7 +887,9 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
   const [view, setView] = useState("regles");
   const [frameScales, setFrameScales] = useState(FRAME_SPRITES.map(() => 1));
   React.useEffect(() => {
-    const covs = new Array(FRAME_SPRITES.length).fill(0);
+    // Mesure le rayon du trou central transparent pour chaque cadre.
+    // Un grand trou = cadre trop petit → scale up pour matcher Bronze.
+    const innerR = new Array(FRAME_SPRITES.length).fill(0);
     let done = 0;
     FRAME_SPRITES.forEach((src, i) => {
       const img = new Image();
@@ -897,18 +899,24 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
         const ctx = c.getContext('2d');
         ctx.drawImage(img, 0, 0);
         const {data} = ctx.getImageData(0, 0, c.width, c.height);
-        let x0=c.width,x1=0,y0=c.height,y1=0;
-        for(let y=0;y<c.height;y++) for(let x=0;x<c.width;x++) {
-          if(data[(y*c.width+x)*4+3]>10){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}
+        const cx=c.width/2, cy=c.height/2;
+        const dirs=[[1,0],[-1,0],[0,1],[0,-1],[0.707,0.707],[-0.707,0.707],[0.707,-0.707],[-0.707,-0.707]];
+        const radii=[];
+        for(const[dx,dy]of dirs){
+          for(let t=4;t<Math.min(c.width,c.height)/2;t++){
+            const x=Math.round(cx+dx*t),y=Math.round(cy+dy*t);
+            if(x<0||x>=c.width||y<0||y>=c.height)break;
+            if(data[(y*c.width+x)*4+3]>20){radii.push(t);break;}
+          }
         }
-        covs[i]=(x1>x0&&y1>y0)?Math.max((x1-x0+1)/c.width,(y1-y0+1)/c.height):1;
+        innerR[i]=radii.length?radii.reduce((a,b)=>a+b)/radii.length:c.width/2;
         if(++done===FRAME_SPRITES.length){
-          const ref=covs[0]||1;
-          // Ne jamais réduire un cadre : max(1.0, ref/coverage)
-          setFrameScales(covs.map(v=>parseFloat(Math.max(1, ref/(v||1)).toFixed(3))));
+          const ref=innerR[0]; // Bronze = référence
+          // trou plus grand → frame plus petite → agrandir (max(1, r/ref))
+          setFrameScales(innerR.map(r=>parseFloat(Math.max(1,r/(ref||1)).toFixed(3))));
         }
       };
-      img.src = src;
+      img.src=src;
     });
   }, []);
   const setBase = (v) => setGameConfig((g) => ({ ...g, xpBase: Math.max(10, Math.min(100000, +v || 0)) }));
