@@ -160,7 +160,9 @@ function ProcessRow([System.Drawing.Bitmap]$sheet,[int]$ry,[int]$rh,[bool]$black
         $cw=$c.E-$c.S+1
         $cell=Crop $rowBmp $c.S 0 $cw $rh
         $cpx=ReadPx $cell
-        $clean=RemoveBG $cpx $black
+        # White-bg sheets need a higher threshold to remove near-white bg residuals (R=216-224)
+        $thr=if($black){30}else{50}
+        $clean=RemoveBG $cpx $black $thr
         $nolabel=RemoveTopLabel $clean $black
         $tr=TrimBmp $nolabel
         if($tr-and$tr.Width-gt4-and$tr.Height-gt4){
