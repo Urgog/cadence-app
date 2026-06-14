@@ -900,20 +900,24 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
         ctx.drawImage(img, 0, 0);
         const {data} = ctx.getImageData(0, 0, c.width, c.height);
         const cx=c.width/2, cy=c.height/2;
+        const half=Math.min(c.width,c.height)/2;
+        const startT=Math.round(half*0.15); // démarre à 15% du centre
         const dirs=[[1,0],[-1,0],[0,1],[0,-1],[0.707,0.707],[-0.707,0.707],[0.707,-0.707],[-0.707,-0.707]];
         const radii=[];
         for(const[dx,dy]of dirs){
-          for(let t=4;t<Math.min(c.width,c.height)/2;t++){
+          for(let t=startT;t<half;t++){
             const x=Math.round(cx+dx*t),y=Math.round(cy+dy*t);
             if(x<0||x>=c.width||y<0||y>=c.height)break;
-            if(data[(y*c.width+x)*4+3]>20){radii.push(t);break;}
+            if(data[(y*c.width+x)*4+3]>80){radii.push(t);break;}
           }
         }
-        innerR[i]=radii.length?radii.reduce((a,b)=>a+b)/radii.length:c.width/2;
+        innerR[i]=radii.length?radii.reduce((a,b)=>a+b)/radii.length:half*0.5;
         if(++done===FRAME_SPRITES.length){
-          const ref=innerR[0]; // Bronze = référence
-          // trou plus grand → frame plus petite → agrandir (max(1, r/ref))
-          setFrameScales(innerR.map(r=>parseFloat(Math.max(1,r/(ref||1)).toFixed(3))));
+          const ref=innerR[0];
+          const scales=innerR.map(r=>parseFloat(Math.max(1,r/(ref||1)).toFixed(3)));
+          console.log('[Cadres] innerR:', innerR.map((r,j)=>`${FRAME_NAMES[j]}=${r.toFixed(1)}`).join(' | '));
+          console.log('[Cadres] scales:', scales.map((s,j)=>`${FRAME_NAMES[j]}=${s}`).join(' | '));
+          setFrameScales(scales);
         }
       };
       img.src=src;
