@@ -610,8 +610,8 @@ function AvatarFrame({ frameIndex, size, tint }) {
   const src = FRAME_SPRITES[frameIndex];
   if (src == null) return null;
   return (
-    <div style={{position:"absolute",left:0,top:0,width:size,height:size,pointerEvents:"none",zIndex:2,isolation:"isolate"}}>
-      {/* screen : les pixels sombres (fond) disparaissent, seules les décorations restent */}
+    <div style={{position:"absolute",left:0,top:0,width:size,height:size,pointerEvents:"none",zIndex:2}}>
+      {/* screen sans isolation : blend contre l'avatar en dessous, fond noir → transparent */}
       <img src={src} alt="" style={{position:"absolute",left:0,top:0,width:size,height:size,imageRendering:"auto",mixBlendMode:"screen"}} />
       {tint && <div style={{
         position:"absolute",inset:0,
@@ -980,7 +980,7 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
                   border: isLegendary ? "1px solid #ffd70030" : "1px solid #ffffff10",
                 }}>
                   {/* Cadre seul — screen supprime le fond sombre, teinte sur pixels opaques */}
-                  <div style={{width:52,height:52,flexShrink:0,position:"relative",isolation:"isolate"}}>
+                  <div style={{width:52,height:52,flexShrink:0,position:"relative"}}>
                     <img src={fsrc} alt={FRAME_NAMES[i]} style={{position:"absolute",inset:0,width:52,height:52,imageRendering:"auto",mixBlendMode:"screen"}} />
                     {tint && <div style={{
                       position:"absolute",inset:0,
