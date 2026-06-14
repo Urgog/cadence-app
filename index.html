@@ -612,7 +612,14 @@ function AvatarFrame({ frameIndex, size, tint }) {
   return (
     <div style={{position:"absolute",left:0,top:0,width:size,height:size,pointerEvents:"none",zIndex:2,isolation:"isolate"}}>
       <img src={src} alt="" style={{position:"absolute",left:0,top:0,width:size,height:size,imageRendering:"auto"}} />
-      {tint && <div style={{position:"absolute",inset:0,background:tint,mixBlendMode:"color",pointerEvents:"none"}} />}
+      {tint && <div style={{
+        position:"absolute",inset:0,
+        background:tint,
+        WebkitMaskImage:`url(${src})`,maskImage:`url(${src})`,
+        WebkitMaskSize:`${size}px ${size}px`,maskSize:`${size}px ${size}px`,
+        WebkitMaskRepeat:"no-repeat",maskRepeat:"no-repeat",
+        mixBlendMode:"color",pointerEvents:"none",
+      }} />}
     </div>
   );
 }
@@ -971,10 +978,17 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
                   background: isLegendary ? "#ffffff05" : "#ffffff07",
                   border: isLegendary ? "1px solid #ffd70030" : "1px solid #ffffff10",
                 }}>
-                  {/* Cadre seul avec teinte appliquée */}
+                  {/* Cadre seul avec teinte masquée sur les pixels opaques uniquement */}
                   <div style={{width:52,height:52,flexShrink:0,position:"relative",isolation:"isolate"}}>
                     <img src={fsrc} alt={FRAME_NAMES[i]} style={{position:"absolute",inset:0,width:52,height:52,imageRendering:"auto"}} />
-                    {tint && <div style={{position:"absolute",inset:0,background:tint,mixBlendMode:"color",pointerEvents:"none"}} />}
+                    {tint && <div style={{
+                      position:"absolute",inset:0,
+                      background:tint,
+                      WebkitMaskImage:`url(${fsrc})`,maskImage:`url(${fsrc})`,
+                      WebkitMaskSize:"52px 52px",maskSize:"52px 52px",
+                      WebkitMaskRepeat:"no-repeat",maskRepeat:"no-repeat",
+                      mixBlendMode:"color",pointerEvents:"none",
+                    }} />}
                   </div>
                   {/* Nom + color picker + sélecteur palier */}
                   <div style={{flex:1,minWidth:0}}>
