@@ -904,7 +904,8 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
         covs[i]=(x1>x0&&y1>y0)?Math.max((x1-x0+1)/c.width,(y1-y0+1)/c.height):1;
         if(++done===FRAME_SPRITES.length){
           const ref=covs[0]||1;
-          setFrameScales(covs.map(v=>parseFloat((ref/(v||1)).toFixed(3))));
+          // Ne jamais réduire un cadre : max(1.0, ref/coverage)
+          setFrameScales(covs.map(v=>parseFloat(Math.max(1, ref/(v||1)).toFixed(3))));
         }
       };
       img.src = src;
