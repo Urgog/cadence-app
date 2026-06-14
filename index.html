@@ -878,7 +878,6 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
           <button className={view === "regles" ? "on" : ""} onClick={() => setView("regles")}>Règles</button>
           <button className={view === "rangs" ? "on" : ""} onClick={() => setView("rangs")}>Rangs</button>
           <button className={view === "cadres" ? "on" : ""} onClick={() => setView("cadres")}>Cadres</button>
-          <button className={view === "attribution" ? "on" : ""} onClick={() => setView("attribution")}>Attribution</button>
         </div>
 
         {view === "regles" && (
@@ -949,90 +948,62 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
 
         {view === "cadres" && (
         <div className="cad-tabpane">
-          <p className="cad-hint">Les 9 cadres se débloquent via les hauts faits de palier. Le cadre Légendaire est réservé au niveau 100.</p>
-          <div className="cad-frame-grid">
-            {FRAME_SPRITES.map((fsrc, i) => {
-              const tierIdx = (cfg.tierFrameMap||GAME_DEFAULT.tierFrameMap).findIndex((f,ti)=>f===i&&ti>0);
-              const seuils = [0,12,23,34,45,56,67,78,89];
-              const unlockTxt = i === 8 ? "Niv.100" : tierIdx>=0 ? `Palier ${tierIdx}` : "Non attribué";
-              return (
-                <div className="cad-frame-card" key={i}>
-                  {/* Avatar composite pour voir le cadre en contexte */}
-                  <div style={{width:72,height:72,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-                    <Avatar level={i===8?89:[0,12,23,34,45,56,67,78][i]||1} size={72} frame={i} />
-                  </div>
-                  <strong style={{fontSize:11,textAlign:"center"}}>{FRAME_NAMES[i]}</strong>
-                  <small style={{fontSize:10,opacity:.5,textAlign:"center"}}>{unlockTxt}</small>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        )}
-
-        {view === "attribution" && (
-        <div className="cad-tabpane">
-          <p className="cad-hint">Choisissez quel cadre se débloque à chaque palier via les hauts faits.</p>
+          <p className="cad-hint">Attribuez chaque cadre à un palier et visualisez l'aperçu en direct. Le cadre Légendaire est réservé au niveau 100.</p>
           <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:8}}>
-            {AVATAR_NAMES.map((name, ti) => {
+            {FRAME_SPRITES.map((fsrc, i) => {
               const seuils = [0,12,23,34,45,56,67,78,89];
-              const tfm = cfg.tierFrameMap||GAME_DEFAULT.tierFrameMap;
-              const fi = tfm[ti];
+              const tfm = cfg.tierFrameMap || GAME_DEFAULT.tierFrameMap;
+              const isLegendary = i === 8;
+              const assignedTier = isLegendary ? -1 : tfm.findIndex((f, ti) => f === i && ti > 0);
               return (
-                <div key={ti} style={{
+                <div key={i} style={{
                   display:"flex", alignItems:"center", gap:10,
                   padding:"8px 10px", borderRadius:8,
-                  background: ti===0 ? "transparent" : "#ffffff07",
-                  border:"1px solid #ffffff10",
-                  opacity: ti===0 ? 0.55 : 1
+                  background: isLegendary ? "#ffffff05" : "#ffffff07",
+                  border: isLegendary ? "1px solid #ffd70030" : "1px solid #ffffff10",
                 }}>
-                  {/* Avatar du palier */}
-                  <AvatarBitmap level={seuils[ti]||0} size={36} />
-                  {/* Infos palier */}
-                  <div style={{flex:1, minWidth:0}}>
-                    <div style={{fontSize:12,fontWeight:600}}>P{ti} — {name}</div>
-                    <div style={{fontSize:10,opacity:.5}}>
-                      Niv.{ti===0?"1–11":`${seuils[ti]}–${ti<8?seuils[ti+1]-1:100}`}
-                    </div>
+                  {/* Cadre seul, sans personnage */}
+                  <div style={{width:52,height:52,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    <img src={fsrc} alt={FRAME_NAMES[i]} style={{width:52,height:52,imageRendering:"auto"}} />
                   </div>
-                  {/* Sélecteur cadre */}
-                  {ti === 0
-                    ? <span style={{fontSize:11,opacity:.4,fontStyle:"italic",flexShrink:0}}>Aucun cadre</span>
-                    : (
-                      <select className="cad-in cad-sel" style={{fontSize:11,flexShrink:0,minWidth:88}}
-                        value={fi??""} onChange={e=>setTierFrame(ti,e.target.value)}>
-                        <option value="">— Aucun —</option>
-                        {FRAME_SPRITES.slice(0,8).map((_,fj)=>(
-                          <option key={fj} value={fj}>{FRAME_NAMES[fj]}</option>
-                        ))}
-                      </select>
-                    )
-                  }
-                  {/* Aperçu composite avatar+cadre */}
-                  <div style={{flexShrink:0, width:52, height:52, display:"flex", alignItems:"center", justifyContent:"center"}}>
-                    {ti>0 && fi!=null
-                      ? <Avatar level={seuils[ti]||1} size={52} frame={fi} />
-                      : <span style={{opacity:.2,fontSize:18,lineHeight:1}}>—</span>
+                  {/* Nom + sélecteur palier */}
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:12,fontWeight:600,color:isLegendary?"#ffd700":"inherit",marginBottom:3}}>{FRAME_NAMES[i]}</div>
+                    {isLegendary
+                      ? <div style={{fontSize:10,opacity:.5}}>Succès spécial — cadre fixe (Niv. 100)</div>
+                      : (
+                        <select className="cad-in cad-sel" style={{fontSize:11,width:"100%"}}
+                          value={assignedTier >= 1 ? assignedTier : ""}
+                          onChange={e => {
+                            const newTier = e.target.value === "" ? null : +e.target.value;
+                            setGameConfig(g => {
+                              const old = g.tierFrameMap || GAME_DEFAULT.tierFrameMap;
+                              const cleared = old.map((f, ti) => (f === i && ti > 0) ? null : f);
+                              if (newTier == null) return { ...g, tierFrameMap: cleared };
+                              return { ...g, tierFrameMap: cleared.map((f, ti) => ti === newTier ? i : f) };
+                            });
+                          }}>
+                          <option value="">— Non attribué —</option>
+                          {AVATAR_NAMES.slice(1).map((name, idx) => {
+                            const ti = idx + 1;
+                            return <option key={ti} value={ti}>Palier {ti} — {name}</option>;
+                          })}
+                        </select>
+                      )
+                    }
+                  </div>
+                  {/* Aperçu live : avatar du palier attribué + ce cadre */}
+                  <div style={{flexShrink:0,width:52,height:52,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    {isLegendary
+                      ? <Avatar level={89} size={52} frame={8} />
+                      : assignedTier >= 1
+                        ? <Avatar level={seuils[assignedTier] || 1} size={52} frame={i} />
+                        : <span style={{opacity:.2,fontSize:18,lineHeight:1}}>—</span>
                     }
                   </div>
                 </div>
               );
             })}
-            {/* Niv.100 — toujours Légendaire */}
-            <div style={{
-              display:"flex", alignItems:"center", gap:10,
-              padding:"8px 10px", borderRadius:8,
-              background:"#ffffff05", border:"1px solid #ffd70030"
-            }}>
-              <span style={{fontSize:26,flexShrink:0}}>🐉</span>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:12,fontWeight:600,color:"#ffd700"}}>Niveau 100 — Légendaire</div>
-                <div style={{fontSize:10,opacity:.5}}>Succès spécial — cadre fixe</div>
-              </div>
-              <div style={{flexShrink:0, width:52, height:52, display:"flex", alignItems:"center", justifyContent:"center"}}>
-                <Avatar level={89} size={52} frame={8} />
-              </div>
-            </div>
           </div>
         </div>
         )}
