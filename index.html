@@ -81,7 +81,7 @@ import {
   CheckSquare, ListChecks, ImagePlus, Loader2,
   ArrowUpDown, ChevronDown, Layers, GripVertical, Activity, LayoutGrid,
   Sun, Moon, Smile, Settings, Download, Upload, Monitor,
-  Coins, Store, Award, Square,
+  Coins, Store, Award, Square, RotateCcw,
 } from "lucide-react";
 
 /* ----------------------------- Date utilities ----------------------------- */
@@ -1309,6 +1309,7 @@ function App() {
     setPlayer(normalizePlayer(PLAYER_DEFAULT));
     setGameConfig(normalizeGame(GAME_DEFAULT));
   };
+  const resetProgression = () => setPlayer(p => normalizePlayer({ ...PLAYER_DEFAULT, name: p.name }));
 
   const commitName = () => { const v = nameDraft.trim(); if (v) setAppName(v); setEditingName(false); };
 
@@ -1532,7 +1533,7 @@ function App() {
           logo={logo} setLogo={setLogo}
           defaultView={defaultView} setDefaultView={setDefaultView}
           onCustomize={() => { setSettingsOpen(false); setGameCfgOpen(true); }}
-          onExport={exportData} onImport={importData} onReset={resetAll} onClose={() => setSettingsOpen(false)} />
+          onExport={exportData} onImport={importData} onReset={resetAll} onResetProgression={resetProgression} onClose={() => setSettingsOpen(false)} />
       )}
 
       {profileOpen && (
@@ -2164,10 +2165,11 @@ function CategoryModal({ status: s, rename, recolor, setBg, setIcon, removeStatu
 }
 
 /* =========================== SETTINGS MODAL ============================ */
-function SettingsModal({ appName, setAppName, themePref, setThemePref, logo, setLogo, defaultView, setDefaultView, onCustomize, onExport, onImport, onReset, onClose }) {
+function SettingsModal({ appName, setAppName, themePref, setThemePref, logo, setLogo, defaultView, setDefaultView, onCustomize, onExport, onImport, onReset, onResetProgression, onClose }) {
   const fileRef = useRef(null);
   const logoRef = useRef(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [confirmResetProg, setConfirmResetProg] = useState(false);
   const [logoBusy, setLogoBusy] = useState(false);
 
   const onLogoFile = async (e) => {
@@ -2232,6 +2234,18 @@ function SettingsModal({ appName, setAppName, themePref, setThemePref, logo, set
           <input ref={fileRef} type="file" accept="application/json,.json" style={{ display: "none" }}
             onChange={(e) => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (f) onImport(f); }} />
         </div>
+
+        {confirmResetProg ? (
+          <div className="cad-reset-confirm">
+            <span>Réinitialiser la progression ? XP, pièces, paliers, cadres, hauts faits… seront effacés. Irréversible.</span>
+            <div>
+              <button className="cad-ghost" onClick={() => setConfirmResetProg(false)}>Annuler</button>
+              <button className="cad-del-btn" onClick={() => { onResetProgression(); setConfirmResetProg(false); }}>Réinitialiser</button>
+            </div>
+          </div>
+        ) : (
+          <button className="cad-reset-link" onClick={() => setConfirmResetProg(true)}><RotateCcw size={14} /> Réinitialiser la progression</button>
+        )}
 
         {confirmReset ? (
           <div className="cad-reset-confirm">
