@@ -611,7 +611,8 @@ function AvatarFrame({ frameIndex, size, tint }) {
   if (src == null) return null;
   return (
     <div style={{position:"absolute",left:0,top:0,width:size,height:size,pointerEvents:"none",zIndex:2,isolation:"isolate"}}>
-      <img src={src} alt="" style={{position:"absolute",left:0,top:0,width:size,height:size,imageRendering:"auto"}} />
+      {/* screen : les pixels sombres (fond) disparaissent, seules les décorations restent */}
+      <img src={src} alt="" style={{position:"absolute",left:0,top:0,width:size,height:size,imageRendering:"auto",mixBlendMode:"screen"}} />
       {tint && <div style={{
         position:"absolute",inset:0,
         background:tint,
@@ -978,9 +979,9 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
                   background: isLegendary ? "#ffffff05" : "#ffffff07",
                   border: isLegendary ? "1px solid #ffd70030" : "1px solid #ffffff10",
                 }}>
-                  {/* Cadre seul avec teinte masquée sur les pixels opaques uniquement */}
+                  {/* Cadre seul — screen supprime le fond sombre, teinte sur pixels opaques */}
                   <div style={{width:52,height:52,flexShrink:0,position:"relative",isolation:"isolate"}}>
-                    <img src={fsrc} alt={FRAME_NAMES[i]} style={{position:"absolute",inset:0,width:52,height:52,imageRendering:"auto"}} />
+                    <img src={fsrc} alt={FRAME_NAMES[i]} style={{position:"absolute",inset:0,width:52,height:52,imageRendering:"auto",mixBlendMode:"screen"}} />
                     {tint && <div style={{
                       position:"absolute",inset:0,
                       background:tint,
@@ -1021,14 +1022,14 @@ function GameConfigModal({ cfg, setGameConfig, onClose }) {
                       )
                     }
                   </div>
-                  {/* Aperçu live : avatar du palier + cadre teinté */}
+                  {/* Aperçu live : avatar du palier attribué (ou palier par défaut) + cadre teinté */}
                   <div style={{flexShrink:0,width:56,height:56,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                    {isLegendary
-                      ? <Avatar level={89} size={52} frame={8} frameTint={tint} />
-                      : assignedTier >= 1
-                        ? <Avatar level={seuils[assignedTier]||1} size={52} frame={i} frameTint={tint} />
-                        : <span style={{opacity:.2,fontSize:18,lineHeight:1}}>—</span>
-                    }
+                    <Avatar
+                      level={isLegendary ? 89 : (assignedTier >= 1 ? seuils[assignedTier] : seuils[Math.min(i+1,8)]) || 1}
+                      size={52}
+                      frame={i}
+                      frameTint={tint}
+                    />
                   </div>
                 </div>
               );
