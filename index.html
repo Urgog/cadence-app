@@ -628,14 +628,23 @@ function AvatarFrame({ frameIndex, size, tint, scale }) {
   const src = FRAME_SPRITES[frameIndex];
   if (src == null) return null;
   const sc = scale || 1;
+  const tfm = sc !== 1 ? {transform:`scale(${sc})`,transformOrigin:"center"} : {};
   return (
     <div style={{position:"absolute",left:0,top:0,width:size,height:size,pointerEvents:"none",zIndex:2}}>
+      {/* screen sans filtre : les pixels sombres restent sombres → disparaissent via screen */}
       <img src={src} alt="" style={{
         position:"absolute",left:0,top:0,width:size,height:size,
-        imageRendering:"auto",mixBlendMode:"screen",
-        ...(tint?{filter:tintFilter(tint)}:{}),
-        ...(sc!==1?{transform:`scale(${sc})`,transformOrigin:"center"}:{}),
+        imageRendering:"auto",mixBlendMode:"screen",...tfm,
       }} />
+      {/* mask+overlay : teinte uniquement les pixels opaques du cadre */}
+      {tint && <div style={{
+        position:"absolute",inset:0,
+        background:tint,
+        WebkitMaskImage:`url(${src})`,maskImage:`url(${src})`,
+        WebkitMaskSize:`${size}px ${size}px`,maskSize:`${size}px ${size}px`,
+        WebkitMaskRepeat:"no-repeat",maskRepeat:"no-repeat",
+        mixBlendMode:"color",pointerEvents:"none",...tfm,
+      }} />}
     </div>
   );
 }
@@ -644,9 +653,9 @@ function AvatarFrame({ frameIndex, size, tint, scale }) {
 function Avatar({ level, size, frame, large, frameTint, frameScale }) {
   const styled = frame != null;
   // Fenêtre intérieure du cadre ≈ 68% de la taille, centrée avec léger décalage haut
-  const inner = styled ? Math.round(size * 0.68) : size;
+  const inner = styled ? Math.round(size * 0.72) : size;
   const padL  = styled ? Math.round((size - inner) / 2) : 0;
-  const padT  = styled ? Math.round(size * 0.10) : 0;
+  const padT  = styled ? Math.round((size - inner) / 2) : 0;
   return (
     <span className={"cad-avatar-wrap" + (large ? " cad-avatar-lg" : "") + (styled ? " framed" : "")}>
       <span className="cad-avatar-inner" style={{ width: size, height: size, position: "relative", overflow:"visible" }}>
