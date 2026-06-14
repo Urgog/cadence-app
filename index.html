@@ -1407,6 +1407,7 @@ function App() {
     setStatuses((p) => { const s = p.find((x) => x.id === id); return (!s || s.locked) ? p : p.filter((x) => x.id !== id); });
     setTasks((p) => p.map((t) => (t.status === id ? withStatus(t, "todo") : t)));
   };
+  const clearStatus = (id) => setTasks((p) => p.filter((t) => t.status !== id));
 
   useEffect(() => {
     const h = (e) => { if (e.key === "Escape") { setEditing(null); setDayModal(null); } };
@@ -1497,7 +1498,7 @@ function App() {
           <KanbanView
             tasks={tasks} statuses={statuses} onEdit={setEditing} moveTask={moveTask}
             dragId={dragId} setDragId={setDragId} toggle={toggle}
-            rename={renameStatus} recolor={recolorStatus} setBg={setStatusBg} setIcon={setStatusIcon} addStatus={addStatus} removeStatus={removeStatus}
+            rename={renameStatus} recolor={recolorStatus} setBg={setStatusBg} setIcon={setStatusIcon} addStatus={addStatus} removeStatus={removeStatus} clearStatus={clearStatus}
           />
         )}
         {view === "calendar" && (
@@ -1825,7 +1826,7 @@ function TaskRow({ task, toggle, remove, onEdit, onToggleCheck, dragMode, draggi
 }
 
 /* ============================== KANBAN VIEW ============================== */
-function KanbanView({ tasks, statuses, onEdit, moveTask, dragId, setDragId, toggle, rename, recolor, setBg, setIcon, addStatus, removeStatus }) {
+function KanbanView({ tasks, statuses, onEdit, moveTask, dragId, setDragId, toggle, rename, recolor, setBg, setIcon, addStatus, removeStatus, clearStatus }) {
   const [catId, setCatId] = useState(null);
   const firstId = statuses[0] ? statuses[0].id : "todo";
   const byStatus = useMemo(() => {
@@ -1851,7 +1852,9 @@ function KanbanView({ tasks, statuses, onEdit, moveTask, dragId, setDragId, togg
       </div>
       {cat && (
         <CategoryModal status={cat} rename={rename} recolor={recolor} setBg={setBg} setIcon={setIcon}
-          removeStatus={removeStatus} onClose={() => setCatId(null)} />
+          removeStatus={removeStatus} clearTasks={() => clearStatus(cat.id)}
+          itemCount={(byStatus[cat.id] || []).length}
+          onClose={() => setCatId(null)} />
       )}
     </>
   );
@@ -2111,8 +2114,9 @@ const DescEditor = forwardRef(function DescEditor({ initial }, ref) {
 });
 
 /* =========================== CATEGORY MODAL ============================ */
-function CategoryModal({ status: s, rename, recolor, setBg, setIcon, removeStatus, onClose }) {
+function CategoryModal({ status: s, rename, recolor, setBg, setIcon, removeStatus, clearTasks, itemCount, onClose }) {
   const [name, setName] = useState(s.label);
+  const [confirmClear, setConfirmClear] = useState(false);
   useEffect(() => { setName(s.label); }, [s.label]);
   const onName = (v) => { setName(v); if (v.trim()) rename(s.id, v); };
 
@@ -2151,9 +2155,25 @@ function CategoryModal({ status: s, rename, recolor, setBg, setIcon, removeStatu
           ))}
         </div>
 
+        {itemCount > 0 && (
+          confirmClear ? (
+            <div className="cad-reset-confirm">
+              <span>Supprimer les {itemCount} tâche{itemCount > 1 ? "s" : ""} de cette catégorie ? Irréversible.</span>
+              <div>
+                <button className="cad-ghost" onClick={() => setConfirmClear(false)}>Annuler</button>
+                <button className="cad-del-btn" onClick={() => { clearTasks(); setConfirmClear(false); onClose(); }}>Supprimer</button>
+              </div>
+            </div>
+          ) : (
+            <button className="cad-reset-link" onClick={() => setConfirmClear(true)}>
+              <Trash2 size={14} /> Vider la catégorie ({itemCount} tâche{itemCount > 1 ? "s" : ""})
+            </button>
+          )
+        )}
+
         <div className="cad-modal-f">
           {!s.locked && (
-            <button className="cad-del" onClick={() => { removeStatus(s.id); onClose(); }}><Trash2 size={15} /> Supprimer</button>
+            <button className="cad-del" onClick={() => { removeStatus(s.id); onClose(); }}><Trash2 size={15} /> Supprimer la catégorie</button>
           )}
           <div className="cad-modal-f-r">
             <button className="cad-primary" onClick={onClose}>Terminé</button>
