@@ -1,0 +1,333 @@
+{
+  "types": [
+    "fire",
+    "water",
+    "nature",
+    "sky",
+    "shadow"
+  ],
+  "familiars": [
+    {
+      "type": "fire",
+      "stage": 1,
+      "file": "familiars/fire_01.png",
+      "width": 52,
+      "height": 67
+    },
+    {
+      "type": "fire",
+      "stage": 2,
+      "file": "familiars/fire_02.png",
+      "width": 64,
+      "height": 54
+    },
+    {
+      "type": "fire",
+      "stage": 3,
+      "file": "familiars/fire_03.png",
+      "width": 81,
+      "height": 62
+    },
+    {
+      "type": "fire",
+      "stage": 4,
+      "file": "familiars/fire_04.png",
+      "width": 106,
+      "height": 73
+    },
+    {
+      "type": "fire",
+      "stage": 5,
+      "file": "familiars/fire_05.png",
+      "width": 90,
+      "height": 94
+    },
+    {
+      "type": "fire",
+      "stage": 6,
+      "file": "familiars/fire_06.png",
+      "width": 131,
+      "height": 112
+    },
+    {
+      "type": "fire",
+      "stage": 7,
+      "file": "familiars/fire_07.png",
+      "width": 161,
+      "height": 131
+    },
+    {
+      "type": "fire",
+      "stage": 8,
+      "file": "familiars/fire_08.png",
+      "width": 190,
+      "height": 147
+    },
+    {
+      "type": "fire",
+      "stage": 9,
+      "file": "familiars/fire_09.png",
+      "width": 186,
+      "height": 148
+    },
+    {
+      "type": "water",
+      "stage": 1,
+      "file": "familiars/water_01.png",
+      "width": 56,
+      "height": 70
+    },
+    {
+      "type": "water",
+      "stage": 2,
+      "file": "familiars/water_02.png",
+      "width": 69,
+      "height": 28
+    },
+    {
+      "type": "water",
+      "stage": 3,
+      "file": "familiars/water_03.png",
+      "width": 77,
+      "height": 37
+    },
+    {
+      "type": "water",
+      "stage": 4,
+      "file": "familiars/water_04.png",
+      "width": 106,
+      "height": 60
+    },
+    {
+      "type": "water",
+      "stage": 5,
+      "file": "familiars/water_05.png",
+      "width": 160,
+      "height": 87
+    },
+    {
+      "type": "water",
+      "stage": 6,
+      "file": "familiars/water_06.png",
+      "width": 158,
+      "height": 93
+    },
+    {
+      "type": "water",
+      "stage": 7,
+      "file": "familiars/water_07.png",
+      "width": 164,
+      "height": 84
+    },
+    {
+      "type": "water",
+      "stage": 8,
+      "file": "familiars/water_08.png",
+      "width": 146,
+      "height": 140
+    },
+    {
+      "type": "water",
+      "stage": 9,
+      "file": "familiars/water_09.png",
+      "width": 170,
+      "height": 141
+    },
+    {
+      "type": "nature",
+      "stage": 1,
+      "file": "familiars/nature_01.png",
+      "width": 56,
+      "height": 69
+    },
+    {
+      "type": "nature",
+      "stage": 2,
+      "file": "familiars/nature_02.png",
+      "width": 45,
+      "height": 58
+    },
+    {
+      "type": "nature",
+      "stage": 3,
+      "file": "familiars/nature_03.png",
+      "width": 57,
+      "height": 75
+    },
+    {
+      "type": "nature",
+      "stage": 4,
+      "file": "familiars/nature_04.png",
+      "width": 89,
+      "height": 84
+    },
+    {
+      "type": "nature",
+      "stage": 5,
+      "file": "familiars/nature_05.png",
+      "width": 149,
+      "height": 114
+    },
+    {
+      "type": "nature",
+      "stage": 6,
+      "file": "familiars/nature_06.png",
+      "width": 143,
+      "height": 127
+    },
+    {
+      "type": "nature",
+      "stage": 7,
+      "file": "familiars/nature_07.png",
+      "width": 142,
+      "height": 141
+    },
+    {
+      "type": "nature",
+      "stage": 8,
+      "file": "familiars/nature_08.png",
+      "width": 155,
+      "height": 147
+    },
+    {
+      "type": "nature",
+      "stage": 9,
+      "file": "familiars/nature_09.png",
+      "width": 133,
+      "height": 147
+    },
+    {
+      "type": "sky",
+      "stage": 1,
+      "file": "familiars/sky_01.png",
+      "width": 56,
+      "height": 69
+    },
+    {
+      "type": "sky",
+      "stage": 2,
+      "file": "familiars/sky_02.png",
+      "width": 43,
+      "height": 51
+    },
+    {
+      "type": "sky",
+      "stage": 3,
+      "file": "familiars/sky_03.png",
+      "width": 62,
+      "height": 64
+    },
+    {
+      "type": "sky",
+      "stage": 4,
+      "file": "familiars/sky_04.png",
+      "width": 91,
+      "height": 84
+    },
+    {
+      "type": "sky",
+      "stage": 5,
+      "file": "familiars/sky_05.png",
+      "width": 119,
+      "height": 119
+    },
+    {
+      "type": "sky",
+      "stage": 6,
+      "file": "familiars/sky_06.png",
+      "width": 142,
+      "height": 130
+    },
+    {
+      "type": "sky",
+      "stage": 7,
+      "file": "familiars/sky_07.png",
+      "width": 144,
+      "height": 136
+    },
+    {
+      "type": "sky",
+      "stage": 8,
+      "file": "familiars/sky_08.png",
+      "width": 163,
+      "height": 132
+    },
+    {
+      "type": "sky",
+      "stage": 9,
+      "file": "familiars/sky_09.png",
+      "width": 180,
+      "height": 135
+    },
+    {
+      "type": "shadow",
+      "stage": 1,
+      "file": "familiars/shadow_01.png",
+      "width": 55,
+      "height": 70
+    },
+    {
+      "type": "shadow",
+      "stage": 2,
+      "file": "familiars/shadow_02.png",
+      "width": 56,
+      "height": 44
+    },
+    {
+      "type": "shadow",
+      "stage": 3,
+      "file": "familiars/shadow_03.png",
+      "width": 43,
+      "height": 75
+    },
+    {
+      "type": "shadow",
+      "stage": 4,
+      "file": "familiars/shadow_04.png",
+      "width": 51,
+      "height": 89
+    },
+    {
+      "type": "shadow",
+      "stage": 5,
+      "file": "familiars/shadow_05.png",
+      "width": 73,
+      "height": 100
+    },
+    {
+      "type": "shadow",
+      "stage": 6,
+      "file": "familiars/shadow_06.png",
+      "width": 122,
+      "height": 107
+    },
+    {
+      "type": "shadow",
+      "stage": 7,
+      "file": "familiars/shadow_07.png",
+      "width": 125,
+      "height": 117
+    },
+    {
+      "type": "shadow",
+      "stage": 8,
+      "file": "familiars/shadow_08.png",
+      "width": 125,
+      "height": 108
+    },
+    {
+      "type": "shadow",
+      "stage": 9,
+      "file": "familiars/shadow_09.png",
+      "width": 117,
+      "height": 111
+    }
+  ],
+  "counts": {
+    "fire": 9,
+    "water": 9,
+    "nature": 9,
+    "sky": 9,
+    "shadow": 9
+  }
+}
